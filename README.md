@@ -1,4 +1,4 @@
-# siamese
+# Overview
 A vanilla siamese net for one-shot classification on the Omniglot dataset, in PyTorch Lightning, with the aim of reducing boilerplate in this [implementation](https://github.com/fangpin/siamese-pytorch).
 
 # References:
