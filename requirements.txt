@@ -3,4 +3,4 @@ Pillow
 torch
 torchvision
 pytorch-lightning
- python-gflags==3.1.2
+python-gflags==3.1.2
