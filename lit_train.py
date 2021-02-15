@@ -33,11 +33,8 @@ gflags.DEFINE_string("test_path", "/home/gexegetic/lightning-siamese/omniglot/py
 gflags.DEFINE_integer("way", 20, "how much way one-shot learning")
 gflags.DEFINE_string("times", 400, "number of samples to test accuracy")
 gflags.DEFINE_integer("workers", 4, "number of dataLoader workers")
-gflags.DEFINE_integer("batch_size", 160, "number of batch size")
+gflags.DEFINE_integer("batch_size", 80, "number of batch size")
 gflags.DEFINE_float("lr", 0.00006, "learning rate")
-gflags.DEFINE_integer("show_every", 10, "show result after each show_every iter.")
-gflags.DEFINE_integer("save_every", 1000, "save model after each save_every iter.")
-gflags.DEFINE_integer("test_every", 100, "test model after each test_every iter.")
 gflags.DEFINE_integer("max_iter", 50000, "number of iterations before stopping")
 gflags.DEFINE_string("model_path", "/home/data/pin/model/siamese", "path to store model")
 gflags.DEFINE_string("gpu_id", "0", "gpu ids used to train")
@@ -58,4 +55,4 @@ testLoader = DataLoader(testSet, batch_size=Flags.way, shuffle=False, num_worker
 net = LitSiamese()
 
 trainer = pl.Trainer(gpus=1)
-trainer.fit(net, trainLoader, testLoader)
+trainer.fit(net, trainLoader)

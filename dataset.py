@@ -40,25 +40,36 @@ class OmniglotTrain(Dataset):
         return  21000000
     
     def __getitem__(self, index):
-        label, img1, img2 = None, None, None
-        if index % 2 == 1: # from the same class
-            label = 1.0
-            idx1 = randint(0, self.num_classes - 1)
-            img1 = choice(self.data[idx1])
-            img2 = choice(self.data[idx1])
-        else:
-            label = 0.0
-            idx1 = randint(0, self.num_classes - 1)
-            idx2 = randint(0, self.num_classes - 1)
-            while idx1 == idx2:
+        anchor, positive, negative = None, None, None
+        idx1 = randint(0, self.num_classes - 1)
+        anchor = choice(self.data[idx1])
+        positive = choice(self.data[idx1])
+
+        # get negative class
+        idx2 = randint(0, self.num_classes - 1)
+        while idx1 == idx2:
                 idx2 = randint(0, self.num_classes - 1)
-            img1 = choice(self.data[idx1])
-            img2 = choice(self.data[idx2])
+        negative = choice(self.data[idx2])
+
+        # if index % 2 == 1: # from the same class
+        #     label = 1.0
+        #     idx1 = randint(0, self.num_classes - 1)
+        #     img1 = choice(self.data[idx1])
+        #     img2 = choice(self.data[idx1])
+        # else:
+        #     label = 0.0
+        #     idx1 = randint(0, self.num_classes - 1)
+        #     idx2 = randint(0, self.num_classes - 1)
+        #     while idx1 == idx2:
+        #         idx2 = randint(0, self.num_classes - 1)
+        #     img1 = choice(self.data[idx1])
+        #     img2 = choice(self.data[idx2])
         
         if self.transform:
-            img1 = self.transform(img1)
-            img2 = self.transform(img2)
-        return img1, img2, torch.from_numpy(array([label], dtype=float32))
+            anchor = self.transform(anchor)
+            positive = self.transform(positive)
+            negative = self.transform(negative)
+        return anchor, positive, negative # torch.from_numpy(array([label], dtype=float32))
 
 
 class OmniglotTest(Dataset):

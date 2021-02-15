@@ -11,7 +11,7 @@ from pytorch_lightning.metrics.functional import accuracy
 
 class LitSiamese(pl.LightningModule):
 
-    def __init__(self, data_dir='./', hidden_size=64, learning_rate=2e-4):
+    def __init__(self, data_dir='./', hidden_size=64, learning_rate=2e-4, alpha=0.2):
         super(LitSiamese, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, 64, 10),
@@ -31,7 +31,8 @@ class LitSiamese(pl.LightningModule):
             nn.Sigmoid()
             )
         self.out = nn.Linear(4096, 1)
-        self.loss = torch.nn.BCEWithLogitsLoss(size_average=True)
+        self.loss = torch.nn.TripletMarginLoss(margin=0.2)
+        self.alpha = alpha
 
     def encoder(self, x):
         x = self.conv(x)
@@ -39,18 +40,21 @@ class LitSiamese(pl.LightningModule):
         x = self.linear(x)
         return x
     
-    def forward(self, x1, x2):
-        ying = self.encoder(x1)
-        yang = self.encoder(x2)
-        l1_distance = torch.abs(ying - yang)
-        return self.out(l1_distance)
+    def forward(self, anchor, positive, negative): # 
+        a = self.encoder(anchor)
+        p = self.encoder(positive)
+        n = self.encoder(negative)
+        return a, p, n
+        # l1_distance = torch.max(torch.abs(a - p) - torch.abs(a - n) + self.alpha, 0)
+        # return self.out(l1_distance)
 
     def training_step(self, batch, batch_idx):
-        img1, img2, label = batch
-        ying = self.encoder(img1)
-        yang = self.encoder(img2)
-        y_hat = self.out(torch.abs(ying - yang))
-        loss = self.loss(y_hat, label)
+        anchor, positive, negative = batch
+        a = self.encoder(anchor)
+        p = self.encoder(positive)
+        n = self.encoder(negative)
+        # y_hat = self.out(torch.abs(ying - yang))
+        loss = self.loss(a, p, n)
         self.log('train_loss', loss)
         return loss
 
